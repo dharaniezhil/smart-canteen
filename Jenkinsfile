@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Cloning repository..."
+                bat '"C:\\Program Files\\Git\\cmd\\git.exe" clone -b main https://github.com/dharaniezhil/smart-canteen.git "%WORKSPACE%"'
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo "Building frontend..."
+                bat 'cd frontend && npm install && npm run build'
+            }
+        }
+
+        stage('Deploy Frontend') {
+            steps {
+                echo "Deploying frontend..."
+                bat 'xcopy /E /I /Y frontend\\build C:\\ProgramData\\Jenkins\\userContent\\smart-canteen'
+            }
+        }
+
+        stage('Start Backend') {
+            steps {
+                echo "Starting backend..."
+                bat 'cd backend && npm install && node server.js'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully ✅"
+        }
+        failure {
+            echo "Pipeline failed ❌"
+        }
+    }
+}
+ 
